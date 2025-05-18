@@ -67,7 +67,7 @@ def generate_figure(filtered_df):
     return fig
 
 # === 页面组件 ===
-header = html.H1("📈 Pink Morsel Visualizer", style={
+header = html.H1("📈 Pink Morsel Visualizer", id="header", style={
     "backgroundColor": COLORS["secondary"],
     "color": COLORS["font"],
     "borderRadius": "12px",
