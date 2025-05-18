@@ -1,65 +1,41 @@
-import pandas as pd
+import csv
 import os
-import glob
 
-# Define input and output paths
-data_dir = "data/"
-output_dir = "output/"
-output_file = "formatted_data.csv"
-output_path = os.path.join(output_dir, output_file)
+DATA_DIRECTORY = "./data"
+OUTPUT_FILE_PATH = "./formatted_data.csv"
 
-# Get all CSV files in the data directory
-file_paths = glob.glob(os.path.join(data_dir, "daily_sales_data_*.csv"))
+# open the output file
+with open(OUTPUT_FILE_PATH, "w") as output_file:
+    writer = csv.writer(output_file)
 
-# Container for processed data
-all_data = []
+    # add a csv header
+    header = ["sales", "date", "region"]
+    writer.writerow(header)
 
-# Process each file
-for file_path in file_paths:
-    df = pd.read_csv(file_path)
-    print("📄 Processing file:", file_path)
-    print("🔑 Original columns:", df.columns.tolist())
-    print("📊 Total rows before filtering:", len(df))
+    # iterate through all files in the data directory
+    for file_name in os.listdir(DATA_DIRECTORY):
+        # open the csv file for reading
+        with open(f"{DATA_DIRECTORY}/{file_name}", "r") as input_file:
+            reader = csv.reader(input_file)
+            # iterate through each row in the csv file
+            row_index = 0
+            for input_row in reader:
+                # if this row is not the csv header, process it
+                if row_index > 0:
+                    # collect data from row
+                    product = input_row[0]
+                    raw_price = input_row[1]
+                    quantity = input_row[2]
+                    transaction_date = input_row[3]
+                    region = input_row[4]
 
-    # Clean up column names
-    df.columns = df.columns.str.strip()
+                    # if this is a pink morsel transaction, process it
+                    if product == "pink morsel":
+                        # finish formatting data
+                        price = float(raw_price[1:])
+                        sale = price * int(quantity)
 
-    # Strip whitespace and lowercase for comparison
-    df["product"] = df["product"].str.strip()
-    print("🧪 Unique product values:", df["product"].unique())
-
-    # Filter for Pink Morsel product only (case insensitive)
-    df = df[df["product"].str.lower() == "pink morsel"]
-    print("🎯 Rows after filtering for 'Pink Morsel':", len(df))
-
-    # Remove $ from price and convert to float
-    df["price"] = df["price"].replace('[\$,]', '', regex=True).astype(float)
-
-    # Calculate sales
-    df["sales"] = df["price"] * df["quantity"]
-
-    # Select relevant columns
-    df_clean = df[["sales", "date", "region"]]
-
-    # Append to list
-    all_data.append(df_clean)
-
-# Concatenate all cleaned data
-final_df = pd.concat(all_data, ignore_index=True)
-print("✅ Final row count after merging all files:", len(final_df))
-
-# Ensure output directory exists
-os.makedirs(output_dir, exist_ok=True)
-
-# If output file exists, remove it to avoid PermissionError
-if os.path.exists(output_path):
-    try:
-        os.remove(output_path)
-        print(f"🧹 Removed existing file: {output_path}")
-    except PermissionError:
-        print(f"❌ Permission denied: please close '{output_path}' and run again.")
-        exit(1)
-
-# Save the result
-final_df.to_csv(output_path, index=False)
-print("📁 Output saved to:", output_path)
+                        # write the row to output file
+                        output_row = [sale, transaction_date, region]
+                        writer.writerow(output_row)
+                row_index += 1
