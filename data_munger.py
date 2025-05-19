@@ -1,33 +1,30 @@
-# data_munger.py
-# 该脚本用于提取原始销售数据中关于 Pink Morsel 的交易记录，并生成结构化的 CSV 文件供分析使用
-
 import csv
 import os
 
-# 输入数据所在目录
+# Directory containing the input data
 DATA_DIRECTORY = "./data"
 
-# 输出文件路径
+# Path to the output file
 OUTPUT_FILE_PATH = "./formatted_data.csv"
 
-# 打开输出文件以写入格式化数据
+# Open the output file for writing formatted data
 with open(OUTPUT_FILE_PATH, "w") as output_file:
     writer = csv.writer(output_file)
 
-    # 写入 CSV 文件表头
+    # Write CSV header row
     header = ["sales", "date", "region"]
     writer.writerow(header)
 
-    # 遍历数据目录下所有 CSV 文件
+    # Iterate through all CSV files in the data directory
     for file_name in os.listdir(DATA_DIRECTORY):
-        # 打开每个文件进行读取
+        # Open each file for reading
         with open(f"{DATA_DIRECTORY}/{file_name}", "r") as input_file:
             reader = csv.reader(input_file)
             row_index = 0
 
-            # 遍历每一行
+            # Iterate through each row
             for input_row in reader:
-                # 跳过第一行表头
+                # Skip the header row
                 if row_index > 0:
                     product = input_row[0]
                     raw_price = input_row[1]
@@ -35,14 +32,14 @@ with open(OUTPUT_FILE_PATH, "w") as output_file:
                     transaction_date = input_row[3]
                     region = input_row[4]
 
-                    # 只处理 pink morsel 的记录
+                    # Process only records for pink morsel
                     if product == "pink morsel":
-                        # 去掉 $ 符号，并转换为浮点数
+                        # Remove the $ symbol and convert to float
                         price = float(raw_price[1:])
-                        # 计算该行销售额
+                        # Calculate the sales amount for the row
                         sale = price * int(quantity)
 
-                        # 写入结构化数据行
+                        # Write the structured data row
                         output_row = [sale, transaction_date, region]
                         writer.writerow(output_row)
                 row_index += 1

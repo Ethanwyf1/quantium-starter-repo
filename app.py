@@ -4,23 +4,23 @@ import pandas as pd
 from dash import Dash, dcc, html, Input, Output
 import plotly.graph_objs as go
 
-# === 配色方案 ===
+# === Color scheme ===
 COLORS = {
-    "primary": "#F9F6FE",     # 背景色
-    "secondary": "#D598EB",   # 组件色
-    "font": "#522A61"         # 字体色
+    "primary": "#F9F6FE",     # Background color
+    "secondary": "#D598EB",   # Component color
+    "font": "#522A61"         # Font color
 }
 
-# === 加载数据 ===
+# === Load data ===
 df = pd.read_csv("formatted_data.csv")
 df["date"] = pd.to_datetime(df["date"])
 df["region"] = df["region"].str.lower()
 
-# === 创建 Dash 应用 ===
+# === Create Dash application ===
 app = Dash(__name__)
 app.title = "Pink Morsel Sales Visualizer"
 
-# === 图表生成函数 ===
+# === Chart generation function ===
 def generate_figure(filtered_df):
     daily_sales = filtered_df.groupby("date")["sales"].sum().reset_index()
 
@@ -34,7 +34,7 @@ def generate_figure(filtered_df):
         hovertemplate="Date: %{x|%Y-%m-%d}<br>Sales: $%{y:,.2f}<extra></extra>"
     ))
 
-    # 添加涨价标记线
+    # Add price increase marker line
     price_change = "2021-01-15"
     fig.add_shape(
         type="line",
@@ -54,7 +54,7 @@ def generate_figure(filtered_df):
         ay=-40
     )
 
-    # 样式美化
+    # Layout styling
     fig.update_layout(
         title="Pink Morsel Sales Over Time",
         xaxis_title="Date",
@@ -66,7 +66,7 @@ def generate_figure(filtered_df):
     )
     return fig
 
-# === 页面组件 ===
+# === Page components ===
 header = html.H1("📈 Pink Morsel Visualizer", id="header", style={
     "backgroundColor": COLORS["secondary"],
     "color": COLORS["font"],
@@ -94,7 +94,7 @@ tip = html.Div("💡 Hover over the line to see daily sales. Red line shows pric
 
 graph = dcc.Graph(id="sales-graph", figure=generate_figure(df))
 
-# === 页面布局 ===
+# === Page layout ===
 app.layout = html.Div([
     header,
     html.Label("Choose a region:", style={"fontWeight": "bold", "textAlign": "left"}),
@@ -108,7 +108,7 @@ app.layout = html.Div([
     "color": COLORS["font"]
 })
 
-# === 回调交互 ===
+# === Callback interaction ===
 @app.callback(
     Output("sales-graph", "figure"),
     Input("region-picker", "value")
@@ -117,6 +117,6 @@ def update_graph(region):
     filtered = df if region == "all" else df[df["region"] == region]
     return generate_figure(filtered)
 
-# === 启动应用 ===
+# === Run the app ===
 if __name__ == "__main__":
     app.run(debug=True)
