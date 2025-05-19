@@ -90,5 +90,4 @@ This command activates your virtual environment and runs all UI tests.
 - CI-compatible test runner script
 
 ### 📷 Screenshot
-
-![Dashboard Screenshot]![image](https://github.com/user-attachments/assets/8e7c25da-2f6a-4881-a4b9-ce01e12182be)
+[image](https://github.com/user-attachments/assets/8e7c25da-2f6a-4881-a4b9-ce01e12182be)
